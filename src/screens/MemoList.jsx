@@ -1,42 +1,82 @@
-import React, { useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, FlatList, StatusBar } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, FlatList } from 'react-native';
+import { db } from '../../firebase';
+import { collection, query, onSnapshot, orderBy, deleteDoc, doc } from 'firebase/firestore';
 
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
-// リスト表示したい配列のデータ
-const MEMO = [
-  {
-    id: '1',
-    text: 'First Item',
-    date: '2024/01/01',
-  },
-  {
-    id: '2',
-    text: 'Second Item',
-    date: '2024/01/01',
-  },
-  {
-    id: '3',
-    text: 'Third Item',
-    date: '2024/01/01',
-  },
-  {
-    id: '4',
-    text: '4th Item',
-    date: '2024/01/01',
-  },
-];
-
 export default function MemoList({ navigation, route }) {
+  // useStateの宣言
+  const [memoList, setMemoList] = useState('');
+
   // パラメータの取得
   const userId = route.params.userId;
+
+  const logout = () => {
+    navigation.goBack();
+  };
+  // メモリストの取得
+  useEffect(() => {
+    // Firestoreのメモコレクションを参照
+    const memosCollectionRef = collection(db, 'users', userId, 'memos');
+    // データを日付で並び替えてクエリを作成
+    const memosQuery = query(memosCollectionRef, orderBy('date', 'desc'));
+
+    // Firestoreのリアルタイム更新を利用してデータを取得
+    const unsubscribe = onSnapshot(memosQuery, (querySnapshot) => {
+      // 取得したドキュメントを配列に変換
+      const docs = querySnapshot.docs.map((doc) => ({
+        ...doc.data(),
+        docId: doc.id,
+      }));
+      // 状態管理でメモリストを更新
+      setMemoList(docs);
+    });
+
+    // クリーンアップで購読を解除
+    return unsubscribe;
+  }, [userId]);
+  useEffect(() => {
+    // Firestoreのメモコレクションを参照
+    const memosCollectionRef = collection(db, 'users', userId, 'memos');
+    // データを日付で並び替えてクエリを作成
+    const memosQuery = query(memosCollectionRef, orderBy('date', 'desc'));
+
+    // Firestoreのリアルタイム更新を利用してデータを取得
+    const unsubscribe = onSnapshot(memosQuery, (querySnapshot) => {
+      // 取得したドキュメントを配列に変換
+      const docs = querySnapshot.docs.map((doc) => ({
+        ...doc.data(),
+        docId: doc.id,
+      }));
+      // 状態管理でメモリストを更新
+      setMemoList(docs);
+    });
+
+    // クリーンアップで購読を解除
+    return unsubscribe;
+  }, [userId]);
+
+  // メモ削除関数
+  const onDelete = async (docId) => {
+    try {
+      // Firestore内の指定ドキュメントを参照
+      const docRef = doc(db, 'users', userId, 'memos', docId);
+      // ドキュメントを削除
+      await deleteDoc(docRef);
+      console.log('ドキュメントの削除に成功しました!');
+    } catch (error) {
+      console.error('ドキュメントの削除に失敗しました: ', error);
+    }
+  };
+
   // ヘッダーの設定
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => {
         return (
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <TouchableOpacity onPressIn={logout}>
             <MaterialCommunityIcons name='logout' size={24} color='#5dacbd' />
           </TouchableOpacity>
         );
@@ -51,14 +91,14 @@ export default function MemoList({ navigation, route }) {
         <View>
           <TouchableOpacity
             onPress={() => {
-              navigation.navigate('MemoEdit', { userId: 'test@mail.com' });
+              navigation.navigate('MemoEdit', { userId: userId });
             }}
           >
-            <Text style={styles.title}>{item.text}</Text>
+            <Text style={styles.title}>{item.memo}</Text>
             <Text style={styles.title}>{item.date}</Text>
           </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.delete}>
+        <TouchableOpacity style={styles.delete} onPressIn={() => onDelete()}>
           <MaterialIcons name='delete' size={30} color='#555' />
         </TouchableOpacity>
       </View>
@@ -68,14 +108,19 @@ export default function MemoList({ navigation, route }) {
   return (
     <View style={styles.container}>
       <FlatList
-        data={MEMO}
+        data={memoList}
         renderItem={renderItem}
         keyExtractor={(item, index) => {
           return index.toString();
         }}
       />
 
-      <TouchableOpacity style={styles.addButton}>
+      <TouchableOpacity
+        style={styles.addButton}
+        onPress={() => {
+          navigation.navigate('MemoEdit', { userId: userId });
+        }}
+      >
         <MaterialIcons name='add-box' size={40} color='black' />
       </TouchableOpacity>
     </View>

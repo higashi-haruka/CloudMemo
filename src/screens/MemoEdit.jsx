@@ -17,9 +17,9 @@ export default function MemoEdit({ navigation, route }) {
   // 新規作成
   const memoCreate = async () => {
     const date = moment().format('YYYY-MM-DD HH:mm:ss'); // 現在の日付を取得
-
     try {
       const memosCollectionRef = collection(db, 'users', userId, 'memos'); // 保存先のコレクションを指定
+
       await addDoc(memosCollectionRef, { memo, date }); // データを Firestore に保存
       console.log('新規メモ作成完了');
       navigation.goBack(); // 前の画面に戻る
@@ -33,13 +33,13 @@ export default function MemoEdit({ navigation, route }) {
     navigation.setOptions({
       headerRight: () => {
         return (
-          <TouchableOpacity onPress={memoCreate}>
+          <TouchableOpacity onPressIn={memoCreate}>
             <MaterialIcons name='save-alt' size={24} color='black' />
           </TouchableOpacity>
         );
       },
     });
-  }, [navigation]);
+  }, [navigation, memoCreate]);
 
   return (
     <View style={styles.container}>
@@ -60,7 +60,7 @@ export default function MemoEdit({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // marginTop: StatusBar.currentHeight || 0,
+
     backgroundColor: '#d4e4e7',
     alignItems: 'center',
 

@@ -8,9 +8,6 @@ import Login from './src/screens/Login'; // ログイン画面
 import MemoList from './src/screens/MemoList'; // メモ一覧画面
 import MemoEdit from './src/screens/MemoEdit'; // メモ編集画面
 
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -33,7 +30,6 @@ export default function App() {
             headerBackVisible: false,
             gestureEnabled: false,
             headerTitleAlign: 'center',
-            headerRight: () => <MaterialCommunityIcons name='logout' size={24} color='black' />,
           }}
         />
         <Stack.Screen
@@ -44,7 +40,6 @@ export default function App() {
             headerStyle: {
               backgroundColor: '#b0e0e6',
             },
-            headerRight: () => <MaterialIcons name='save-alt' size={24} color='black' />,
           }}
         />
       </Stack.Navigator>

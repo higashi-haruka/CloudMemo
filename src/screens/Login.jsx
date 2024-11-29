@@ -7,39 +7,37 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'fire
 import { Alert } from 'react-native'; // アラートを表示するコンポーネント
 
 export default function Login({ navigation }) {
-  // useStateの宣言
+  // useStateの宣言 （状態管理）
   const [mail, setMail] = useState('');
   const [pass, setPass] = useState('');
 
   // ユーザの新規登録を行う関数
   const createUser = () => {
     console.log(`${mail},${pass}`);
-    createUserWithEmailAndPassword(auth, mail, pass)
-      .then(() => {
-        // 成功時の処理
-        navigation.navigate('MemoList', { userId: 'test@mail.com' });
-        console.log('新規登録しました!');
-      })
-      .catch((err) => {
-        // 失敗時の処理
-        console.log(err.code);
-        Alert.alert('エラー');
-      });
+    createUserWithEmailAndPassword(auth, mail, pass);
+    try {
+      // 成功時の処理
+      navigation.navigate('MemoList', { userId: mail });
+      console.log('新規登録しました!');
+    } catch (err) {
+      // 失敗時の処理
+      console.log(err);
+      Alert.alert('エラー');
+    }
   };
   // ユーザのログインを行う関数
   const loginUser = () => {
     console.log(`${mail},${pass}`);
-    signInWithEmailAndPassword(auth, mail, pass)
-      .then(() => {
-        // 成功時の処理
-        navigation.navigate('MemoList', { userId: 'test@mail.com' });
-        console.log('ログインしました!');
-      })
-      .catch((err) => {
-        // 失敗時の処理
-        console.log(err.code);
-        Alert.alert('エラー');
-      });
+    signInWithEmailAndPassword(auth, mail, pass);
+    try {
+      // 成功時の処理
+      navigation.navigate('MemoList', { userId: mail });
+      console.log('ログインしました!');
+    } catch (err) {
+      // 失敗時の処理
+      console.log(err.code);
+      Alert.alert('エラー');
+    }
   };
 
   return (
@@ -53,6 +51,7 @@ export default function Login({ navigation }) {
             setMail(text);
           }}
           placeholder='メールアドレス'
+          autoCapitalize='none'
         />
         <TextInput
           style={styles.textInput}
@@ -62,6 +61,7 @@ export default function Login({ navigation }) {
             setPass(text);
           }}
           placeholder='パスワード'
+          secureTextEntry={true}
         />
       </View>
       <TouchableOpacity style={[styles.button, styles.loginButton]} onPress={loginUser}>

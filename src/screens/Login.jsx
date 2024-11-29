@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Button } from 'react-native';
 import { auth } from '../../firebase';
+
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth'; // ログインと新規登録に使用するコンポーネント
 
@@ -10,6 +12,11 @@ export default function Login({ navigation }) {
   // useStateの宣言 （状態管理）
   const [mail, setMail] = useState('');
   const [pass, setPass] = useState('');
+
+  const [isSecureEntry, setIsSecureEntry] = useState(true);
+  const toggleSecureEntry = () => {
+    setIsSecureEntry(!isSecureEntry);
+  };
 
   // ユーザの新規登録を行う関数
   const createUser = () => {
@@ -53,16 +60,20 @@ export default function Login({ navigation }) {
           placeholder='メールアドレス'
           autoCapitalize='none'
         />
-        <TextInput
-          style={styles.textInput}
-          value={pass}
-          autoCorrect={false}
-          onChangeText={(text) => {
-            setPass(text);
-          }}
-          placeholder='パスワード'
-          secureTextEntry={true}
-        />
+        <View style={styles.passwordContainer}>
+          <TextInput
+            value={pass}
+            autoCorrect={false}
+            onChangeText={(text) => {
+              setPass(text);
+            }}
+            placeholder='パスワード'
+            secureTextEntry={isSecureEntry}
+          />
+          <TouchableOpacity style={styles.iconContainer} onPress={toggleSecureEntry}>
+            <Ionicons name={isSecureEntry ? 'eye-sharp' : 'eye-off-sharp'} size={24} color='#555' />
+          </TouchableOpacity>
+        </View>
       </View>
       <TouchableOpacity style={[styles.button, styles.loginButton]} onPress={loginUser}>
         <Text style={styles.loginText}>ログイン</Text>
@@ -86,6 +97,18 @@ const styles = StyleSheet.create({
   },
   textInput: {
     margin: 7,
+    paddingHorizontal: 10, // 要素の内側の余白（左右）
+    height: 43, // 高さ
+    width: 320, // 幅
+    borderRadius: 6, // 要素の境界の外側の角を丸める
+    backgroundColor: '#eee',
+    fontSize: 15, // 文字の大きさ
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    margin: 5,
     paddingHorizontal: 10, // 要素の内側の余白（左右）
     height: 43, // 高さ
     width: 320, // 幅

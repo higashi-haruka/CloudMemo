@@ -84,6 +84,7 @@ const styles = StyleSheet.create({
   },
   textInput: {
     backgroundColor: '#fff',
+    padding: 20,
     fontSize: 25, // 文字の大きさ
     height: '100%',
     width: 400,

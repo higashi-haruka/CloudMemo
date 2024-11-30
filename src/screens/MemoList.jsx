@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, FlatList } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, FlatList, Alert } from 'react-native';
 import { db } from '../../firebase';
 import { collection, query, onSnapshot, orderBy, deleteDoc, doc } from 'firebase/firestore';
 
@@ -13,9 +13,80 @@ export default function MemoList({ navigation, route }) {
   // パラメータの取得
   const userId = route.params.userId;
 
+  //ログアウトアラート
+  const logoutAlert = () => {
+    Alert.alert('ログアウトしますか？', '', [
+      { text: 'はい', onPress: () => logout() },
+      {
+        text: 'キャンセル',
+        onPress: () => console.log('ログアウトをキャンセルしました。'),
+        style: 'cancel',
+      },
+    ]);
+  };
+
+  //ログアウト関数
   const logout = () => {
+    console.log('ログアウトしました。');
     navigation.goBack();
   };
+
+  //削除アラート
+  const memoDelete = async (docId) => {
+    Alert.alert('削除しますか？', '', [
+      { text: 'はい', onPress: () => onDelete(docId) },
+      {
+        text: 'キャンセル',
+        onPress: () => console.log('削除をキャンセルしました。'),
+        style: 'cancel',
+      },
+    ]);
+  };
+  // メモ削除関数
+  const onDelete = async (docId) => {
+    try {
+      // Firestore内の指定ドキュメントを参照
+      const docRef = doc(db, 'users', userId, 'memos', docId);
+      // ドキュメントを削除
+      await deleteDoc(docRef);
+      console.log('ドキュメントの削除に成功しました!');
+    } catch (error) {
+      console.error('ドキュメントの削除に失敗しました: ', error);
+    }
+  };
+  // リストのレンダリング
+  const renderItem = ({ item }) => {
+    return (
+      <View style={styles.item}>
+        <View style={styles.memo}>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate('MemoEdit', { userId: userId }, { id: item.docId });
+            }}
+          >
+            <Text style={styles.title}>{item.memo}</Text>
+            <Text style={styles.date}>{item.date}</Text>
+          </TouchableOpacity>
+        </View>
+        <TouchableOpacity style={styles.delete} onPressIn={() => memoDelete(item.docId)}>
+          <MaterialIcons name='delete' size={30} color='#555' />
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
+  // ヘッダーの設定
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => {
+        return (
+          <TouchableOpacity onPressIn={logoutAlert}>
+            <MaterialCommunityIcons name='logout' size={24} color='#5dacbd' />
+          </TouchableOpacity>
+        );
+      },
+    });
+  }, [navigation]);
 
   // メモリストの取得
   useEffect(() => {
@@ -31,64 +102,13 @@ export default function MemoList({ navigation, route }) {
         ...doc.data(),
         docId: doc.id,
       }));
+      const docId = doc.id;
       // 状態管理でメモリストを更新
       setMemoList(docs);
     });
-
     // クリーンアップで購読を解除
     return unsubscribe;
   }, [userId]);
-
-  // メモ削除関数
-  const onDelete = async (docId) => {
-    try {
-      // Firestore内の指定ドキュメントを参照
-      const docRef = doc(db, 'users', userId, 'memos', docId);
-      // ドキュメントを削除
-      await deleteDoc(docRef);
-      console.log('ドキュメントの削除に成功しました!');
-    } catch (error) {
-      console.error('ドキュメントの削除に失敗しました: ', error);
-    }
-  };
-
-  // ヘッダーの設定
-  useEffect(() => {
-    navigation.setOptions({
-      headerRight: () => {
-        return (
-          <TouchableOpacity onPressIn={logout}>
-            <MaterialCommunityIcons name='logout' size={24} color='#5dacbd' />
-          </TouchableOpacity>
-        );
-      },
-    });
-  }, [navigation]);
-
-  // リストのレンダリング
-  const renderItem = ({ item }) => {
-    return (
-      <View style={styles.item}>
-        <View style={styles.memo}>
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate('MemoEdit', { userId: userId });
-            }}
-          >
-            <Text style={styles.title}>{item.memo}</Text>
-            <Text style={styles.date}>{item.date}</Text>
-          </TouchableOpacity>
-        </View>
-        <TouchableOpacity
-          style={styles.delete}
-          onPressIn={() => onDelete()}
-          // onPressIn={console.log(item.memo)}
-        >
-          <MaterialIcons name='delete' size={30} color='#555' />
-        </TouchableOpacity>
-      </View>
-    );
-  };
 
   return (
     <View style={styles.container}>
@@ -103,7 +123,7 @@ export default function MemoList({ navigation, route }) {
       <TouchableOpacity
         style={styles.addButton}
         onPress={() => {
-          navigation.navigate('MemoEdit', { userId: userId });
+          navigation.navigate('MemoEdit', { userId: userId }, { id: '' });
         }}
       >
         <MaterialIcons name='add-box' size={40} color='black' />

@@ -7,9 +7,10 @@ import { addDoc, collection } from 'firebase/firestore'; // 保存に必要な�
 
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
-export default function MemoEdit({ navigation, route }) {
+export default function MemoEdit({ navigation, route, id }) {
   // パラメータの取得;
   const userId = route.params.userId;
+  // const docId = id.params.id;
 
   // useStateの宣言
   const [memo, setMemo] = useState('');

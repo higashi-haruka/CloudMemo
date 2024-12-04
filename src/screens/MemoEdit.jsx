@@ -46,14 +46,17 @@ export default function MemoEdit({ navigation, route }) {
 
   //条件分岐
   const judge = async () => {
+    //新規作成かどうか
     if (isNew) {
       return memoCreate();
     }
+    //編集されたかどうか
     if (memo == '') {
       console.log('編集されていません');
       navigation.goBack(); // 前の画面に戻る
       return;
     }
+    //編集機能へ
     return changAdmin();
   };
 

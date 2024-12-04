@@ -3,14 +3,16 @@ import { StyleSheet, View, TextInput, TouchableOpacity } from 'react-native';
 import moment from 'moment'; // 日付を扱うためのライブラリ
 
 import { db } from '../../firebase';
-import { addDoc, collection } from 'firebase/firestore'; // 保存に必要な関数
+import { addDoc, collection, disableNetwork, doc, updateDoc } from 'firebase/firestore'; // 保存に必要な関数
 
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
-export default function MemoEdit({ navigation, route, id }) {
+export default function MemoEdit({ navigation, route }) {
   // パラメータの取得;
   const userId = route.params.userId;
-  // const docId = id.params.id;
+  const docId = route.params.docId;
+  const savedMemo = route.params.memo;
+  const isNew = route.params.isNew;
 
   // useStateの宣言
   const [memo, setMemo] = useState('');
@@ -29,18 +31,44 @@ export default function MemoEdit({ navigation, route, id }) {
     }
   };
 
+  //編集機能
+  const changAdmin = async () => {
+    const date = moment().format('YYYY-MM-DD HH:mm:ss'); // 現在の日付を取得
+    try {
+      const docRef = doc(db, 'users', userId, 'memos', docId);
+      await updateDoc(docRef, { memo, date });
+      console.log('メモ編集完了');
+      navigation.goBack(); // 前の画面に戻る
+    } catch (err) {
+      console.error('メモ編集に失敗しました:', err);
+    }
+  };
+
+  //条件分岐
+  const judge = async () => {
+    if (isNew) {
+      return memoCreate();
+    }
+    if (memo == '') {
+      console.log('編集されていません');
+      navigation.goBack(); // 前の画面に戻る
+      return;
+    }
+    return changAdmin();
+  };
+
   // ヘッダーの設定
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => {
         return (
-          <TouchableOpacity onPressIn={memoCreate}>
+          <TouchableOpacity onPressIn={judge}>
             <MaterialIcons name='save-alt' size={24} color='black' />
           </TouchableOpacity>
         );
       },
     });
-  }, [navigation, memoCreate]);
+  }, [navigation, judge]);
 
   return (
     <View style={styles.container}>
@@ -48,7 +76,7 @@ export default function MemoEdit({ navigation, route, id }) {
         multiline={true}
         style={styles.textInput}
         placeholder='メモ編集内容'
-        value={memo}
+        defaultValue={savedMemo}
         autoCorrect={false}
         onChangeText={(text) => {
           setMemo(text);

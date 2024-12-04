@@ -61,7 +61,12 @@ export default function MemoList({ navigation, route }) {
         <View style={styles.memo}>
           <TouchableOpacity
             onPress={() => {
-              navigation.navigate('MemoEdit', { userId: userId }, { id: item.docId });
+              navigation.navigate('MemoEdit', {
+                userId: userId,
+                docId: item.docId,
+                memo: item.memo,
+                isNew: false,
+              });
             }}
           >
             <Text style={styles.title}>{item.memo}</Text>
@@ -123,7 +128,7 @@ export default function MemoList({ navigation, route }) {
       <TouchableOpacity
         style={styles.addButton}
         onPress={() => {
-          navigation.navigate('MemoEdit', { userId: userId }, { id: '' });
+          navigation.navigate('MemoEdit', { userId: userId, isNew: true });
         }}
       >
         <MaterialIcons name='add-box' size={40} color='black' />

@@ -3,6 +3,8 @@ import { StyleSheet, Text, View, TouchableOpacity, FlatList, Alert } from 'react
 import { db } from '../../firebase';
 import { collection, query, onSnapshot, orderBy, deleteDoc, doc } from 'firebase/firestore';
 
+import foot from '../../assets/footer.png';
+
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
@@ -205,7 +207,9 @@ const styles = StyleSheet.create({
   memo: { width: 250, height: 60 },
 
   footer: {
-    backgroundColor: '#E0E0E0',
+    backgroundImage: 'url($)',
+    backgroundSize: 'cover',
+    // backgroundColor: '#E0E0E0',
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',

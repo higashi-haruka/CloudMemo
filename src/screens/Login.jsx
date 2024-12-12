@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image } from 'reac
 import { auth } from '../../firebase';
 
 import Ionicons from '@expo/vector-icons/Ionicons';
-import rogo from '../../assets/rogo.png';
+import rogo from '../../assets/logo.png';
 
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth'; // ログインと新規登録に使用するコンポーネント
 

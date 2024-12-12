@@ -1,5 +1,13 @@
 import React, { memo, useEffect, useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, FlatList, Alert } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  FlatList,
+  Alert,
+  ImageBackground,
+} from 'react-native';
 import { db } from '../../firebase';
 import { collection, query, onSnapshot, orderBy, deleteDoc, doc } from 'firebase/firestore';
 
@@ -126,30 +134,37 @@ export default function MemoList({ navigation, route }) {
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={memoList}
-        renderItem={renderItem}
-        keyExtractor={(item, index) => {
-          return index.toString();
-        }}
-      />
-      <View style={styles.footer}>
-        <TouchableOpacity style={styles.sortButton} onPress={toggleSort}>
-          <MaterialCommunityIcons
-            name={isSort ? 'sort-clock-descending' : 'sort-clock-ascending'}
-            size={40}
-            color='#606060'
-          />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => {
-            navigation.navigate('MemoEdit', { userId: userId, isNew: true });
+      <View style={styles.list}>
+        <FlatList
+          data={memoList}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => {
+            return index.toString();
           }}
-        >
-          <MaterialIcons name='add-box' size={40} color='#606060' />
-        </TouchableOpacity>
+        />
+      </View>
+
+      <View style={styles.footer}>
+        <ImageBackground source={foot}>
+          <View style={styles.footerbutton}>
+            <TouchableOpacity style={styles.sortButton} onPress={toggleSort}>
+              <MaterialCommunityIcons
+                name={isSort ? 'sort-clock-descending' : 'sort-clock-ascending'}
+                size={50}
+                color='#606060'
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.addButton}
+              onPress={() => {
+                navigation.navigate('MemoEdit', { userId: userId, isNew: true });
+              }}
+            >
+              <MaterialIcons name='add-box' size={50} color='#606060' />
+            </TouchableOpacity>
+          </View>
+        </ImageBackground>
       </View>
     </View>
   );
@@ -185,7 +200,9 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: 6, // 要素の境界の外側の角を丸める
   },
-
+  list: {
+    paddingBottom: 80,
+  },
   item: {
     width: 350,
     flexDirection: 'row',
@@ -207,15 +224,22 @@ const styles = StyleSheet.create({
   memo: { width: 250, height: 60 },
 
   footer: {
-    backgroundImage: 'url($)',
+    position: 'absolute',
     backgroundSize: 'cover',
-    // backgroundColor: '#E0E0E0',
+    // backgroundColor: '#d4e4e780',
     flexDirection: 'row',
     justifyContent: 'space-around',
-    alignItems: 'center',
+
     bottom: 0,
     width: '100%',
-    height: '10%',
+    height: '15%',
+  },
+  footerbutton: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
   },
 
   sortButton: {

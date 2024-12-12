@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Button } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image } from 'react-native';
 import { auth } from '../../firebase';
 
 import Ionicons from '@expo/vector-icons/Ionicons';
+import rogo from '../../assets/rogo.png';
 
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth'; // ログインと新規登録に使用するコンポーネント
 
@@ -49,6 +50,7 @@ export default function Login({ navigation }) {
 
   return (
     <View style={styles.container}>
+      <Image style={styles.rogo} source={rogo} alt='picture' />
       <View style={styles.inputArea}>
         <TextInput
           style={styles.textInput}
@@ -91,6 +93,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#d4e4e7',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  rogo: {
+    width: 150,
+    height: 150,
   },
   inputArea: {
     margin: 20, // 要素の外側の余白

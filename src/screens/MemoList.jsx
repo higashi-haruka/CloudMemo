@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, FlatList, Alert } from 'react-native';
 import { db } from '../../firebase';
 import { collection, query, onSnapshot, orderBy, deleteDoc, doc } from 'firebase/firestore';
@@ -10,6 +10,12 @@ export default function MemoList({ navigation, route }) {
   // useStateの宣言
   const [memoList, setMemoList] = useState('');
 
+  const [isSort, setSort] = useState('true');
+
+  //ソート順変更関数
+  const toggleSort = () => {
+    setSort(!isSort);
+  };
   // パラメータの取得
   const userId = route.params.userId;
 
@@ -54,6 +60,7 @@ export default function MemoList({ navigation, route }) {
       console.error('ドキュメントの削除に失敗しました: ', error);
     }
   };
+
   // リストのレンダリング
   const renderItem = ({ item }) => {
     return (
@@ -86,7 +93,7 @@ export default function MemoList({ navigation, route }) {
       headerRight: () => {
         return (
           <TouchableOpacity onPressIn={logoutAlert}>
-            <MaterialCommunityIcons name='logout' size={24} color='#5dacbd' />
+            <MaterialCommunityIcons name='logout' size={24} color='#606060' />
           </TouchableOpacity>
         );
       },
@@ -98,7 +105,7 @@ export default function MemoList({ navigation, route }) {
     // Firestoreのメモコレクションを参照
     const memosCollectionRef = collection(db, 'users', userId, 'memos');
     // データを日付で並び替えてクエリを作成
-    const memosQuery = query(memosCollectionRef, orderBy('date', 'desc'));
+    const memosQuery = query(memosCollectionRef, orderBy('date', isSort ? 'desc' : 'asc'));
 
     // Firestoreのリアルタイム更新を利用してデータを取得
     const unsubscribe = onSnapshot(memosQuery, (querySnapshot) => {
@@ -113,7 +120,7 @@ export default function MemoList({ navigation, route }) {
     });
     // クリーンアップで購読を解除
     return unsubscribe;
-  }, [userId]);
+  }, [userId, isSort]);
 
   return (
     <View style={styles.container}>
@@ -124,15 +131,24 @@ export default function MemoList({ navigation, route }) {
           return index.toString();
         }}
       />
+      <View style={styles.footer}>
+        <TouchableOpacity style={styles.sortButton} onPress={toggleSort}>
+          <MaterialCommunityIcons
+            name={isSort ? 'sort-clock-descending' : 'sort-clock-ascending'}
+            size={40}
+            color='#606060'
+          />
+        </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress={() => {
-          navigation.navigate('MemoEdit', { userId: userId, isNew: true });
-        }}
-      >
-        <MaterialIcons name='add-box' size={40} color='black' />
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => {
+            navigation.navigate('MemoEdit', { userId: userId, isNew: true });
+          }}
+        >
+          <MaterialIcons name='add-box' size={40} color='#606060' />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -188,13 +204,33 @@ const styles = StyleSheet.create({
   },
   memo: { width: 250, height: 60 },
 
-  addButton: {
-    position: 'absolute', // これを設定することで、他のコンポーネントに邪魔されず固定することができます。
+  footer: {
+    backgroundColor: '#E0E0E0',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
     alignItems: 'center',
-    justifyContent: 'center',
-    bottom: 40, // 要素が起点の下からどれだけ離れているかを示します
-    right: 20, // 要素が起点の右からどれだけ離れているかを示します
-    height: 50,
-    width: 50,
+    bottom: 0,
+    width: '100%',
+    height: '10%',
+  },
+
+  sortButton: {
+    // position: 'absolute', // これを設定することで、他のコンポーネントに邪魔されず固定することができます。
+    // alignItems: 'center',
+    // justifyContent: 'center',
+    // bottom: 10, // 要素が起点の下からどれだけ離れているかを示します
+    // right: 50, // 要素が起点の右からどれだけ離れているかを示します
+    // height: 50,
+    // width: 50,
+  },
+
+  addButton: {
+    // position: 'absolute', // これを設定することで、他のコンポーネントに邪魔されず固定することができます。
+    // alignItems: 'center',
+    // justifyContent: 'center',
+    // bottom: 10, // 要素が起点の下からどれだけ離れているかを示します
+    // right: 10, // 要素が起点の右からどれだけ離れているかを示します
+    // height: 50,
+    // width: 50,
   },
 });

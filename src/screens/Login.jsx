@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, View, TextInput, TouchableOpacity, Image } from 'react-native';
 import { auth } from '../../firebase';
+import { Text, Button, useTheme } from 'react-native-paper';
 
 import Ionicons from '@expo/vector-icons/Ionicons';
 import rogo from '../../assets/logo.png';
@@ -18,6 +19,8 @@ export default function Login({ navigation }) {
   const toggleSecureEntry = () => {
     setIsSecureEntry(!isSecureEntry);
   };
+
+  const theme = useTheme();
 
   // ユーザの新規登録を行う関数
   const createUser = () => {
@@ -77,6 +80,18 @@ export default function Login({ navigation }) {
           </TouchableOpacity>
         </View>
       </View>
+      {/* <Button
+        icon='teddy-bear'
+        mode='contained'
+        style={[styles.button, styles.loginButton]}
+        onPress={loginUser}
+      >
+        ログイン
+      </Button>
+      <Button icon='teddy-bear' mode='contained' style={[styles.button]} onPress={createUser}>
+        新規登録
+      </Button> */}
+
       <TouchableOpacity style={[styles.button, styles.loginButton]} onPress={loginUser}>
         <Text style={styles.loginText}>ログイン</Text>
       </TouchableOpacity>

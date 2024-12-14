@@ -226,7 +226,6 @@ const styles = StyleSheet.create({
   footer: {
     position: 'absolute',
     backgroundSize: 'cover',
-    // backgroundColor: '#d4e4e780',
     flexDirection: 'row',
     justifyContent: 'space-around',
 

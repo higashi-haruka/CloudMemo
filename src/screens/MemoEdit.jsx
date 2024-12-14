@@ -78,7 +78,7 @@ export default function MemoEdit({ navigation, route }) {
       <TextInput
         multiline={true}
         style={styles.textInput}
-        placeholder='メモ編集内容'
+        placeholder='新規メモ内容'
         defaultValue={savedMemo}
         autoCorrect={false}
         onChangeText={(text) => {

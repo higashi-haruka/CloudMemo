@@ -10,6 +10,7 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'fire
 
 import { Alert } from 'react-native'; // アラートを表示するコンポーネント
 
+//test
 export default function Login({ navigation }) {
   // useStateの宣言 （状態管理）
   const [mail, setMail] = useState('');

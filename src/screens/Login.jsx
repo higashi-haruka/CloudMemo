@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, TextInput, TouchableOpacity, Image } from 'react-native';
 import { auth } from '../../firebase';
 import { Text, Button, useTheme } from 'react-native-paper';
-
+import * as SecureStore from 'expo-secure-store';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import rogo from '../../assets/logo.png';
 
@@ -22,12 +22,38 @@ export default function Login({ navigation }) {
 
   const theme = useTheme();
 
+  //自動ログイン機能
+  useEffect(() => {
+    const autoLogin = async () => {
+      try {
+        const resultMail = SecureStore.getItemAsync('mail');
+        const resultPass = SecureStore.getItemAsync('pass');
+        if (resultMail && resultPass) {
+          setMail(resultMail);
+          setPass(resultPass);
+
+          alert("🔐 Here's your value 🔐 \n" + resultMail);
+          signInWithEmailAndPassword(auth, resultMail, resultPass);
+          navigation.navigate('MemoList', { userId: resultMail });
+          console.log('自動ログインしました!');
+        }
+      } catch {
+        alert('No values stored under that key.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    autoLogin();
+  }, []);
+
   // ユーザの新規登録を行う関数
   const createUser = () => {
     console.log(`${mail},${pass}`);
     createUserWithEmailAndPassword(auth, mail, pass);
     try {
       // 成功時の処理
+      SecureStore.setItemAsync('mail', mail);
+      SecureStore.setItemAsync('pass', pass);
       navigation.navigate('MemoList', { userId: mail });
       console.log('新規登録しました!');
     } catch (err) {
@@ -40,8 +66,11 @@ export default function Login({ navigation }) {
   const loginUser = () => {
     console.log(`${mail},${pass}`);
     signInWithEmailAndPassword(auth, mail, pass);
+
     try {
       // 成功時の処理
+      SecureStore.setItemAsync('mail', mail);
+      SecureStore.setItemAsync('pass', pass);
       navigation.navigate('MemoList', { userId: mail });
       console.log('ログインしました!');
     } catch (err) {
